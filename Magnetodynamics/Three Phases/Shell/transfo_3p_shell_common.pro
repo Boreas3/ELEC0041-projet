@@ -1,4 +1,7 @@
-
+DefineConstant[
+  gap_Core = {0.01, Min 0, Max 1e-3, Step 1e-3,
+    Name "Air gap"}
+];
 // Dimensions
 
 width_Core = 1.5;
@@ -24,7 +27,7 @@ width_Coil_3 = 0.05;
 height_Coil_3 = 0.25;
 gap_Core_Coil_3 = 0.025;
 
-gap_Core = 0.00; 
+//gap_Core = 0.01; 
 gap_Core_Box_X = 1.;
 gap_Core_Box_Y = 1.;
 
