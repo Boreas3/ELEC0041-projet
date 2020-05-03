@@ -8,11 +8,11 @@ DefineConstant[
   Config_second = {1, Choices{1="Star", 2 = "Delta"}, Highlight "Green", 
   Name "Connection type - secondary side"}
   Freq = {50, Name "Frequency"}
-  val_E_in = {60e3, Name "Voltage at the primary side"}
+  val_U_in = {60e3, Name "Voltage at the primary side (phase to phase)"}
   mur_Core = {1000, Min 1, Max 10000, Step 1,
     Name "Parameters/Core relative permeability"}
   n_PRIM = {500, Min 100, Max 1000, Step 100, Name "Number of turn - primary side"}
-  V_ratio = {25, Name "Transformer ratio"}
+  V_ratio = {25, Name "Transformer ratio - phase to phase"}
 ];
 
 Group {
@@ -86,9 +86,27 @@ Function {
 
   If(ConductorType == 2)
     // Number of turns in the coils (same for PLUS and MINUS portions) 
-	  n_SECOND = n_PRIM/V_ratio;
-    Ns[Coil_PRIM] = n_PRIM;
-    Ns[Coil_SECOND] = n_SECOND;
+    If (Config_prim == 1)
+      If (Config_second == 1)
+        n_SECOND = n_PRIM/V_ratio;
+        Ns[Coil_PRIM] = n_PRIM;
+        Ns[Coil_SECOND] = n_SECOND;
+      ElseIf (Config_second == 2)
+        n_SECOND = Sqrt[3] * n_PRIM/V_ratio;
+        Ns[Coil_PRIM] = n_PRIM;
+        Ns[Coil_SECOND] = n_SECOND;
+      EndIf
+    ElseIf (Config_prim == 2)
+      If (Config_second == 1)
+        n_SECOND = n_PRIM/(V_ratio*Sqrt[3]);
+        Ns[Coil_PRIM] = n_PRIM;
+        Ns[Coil_SECOND] = n_SECOND;
+      ElseIf (Config_second == 2)
+        n_SECOND = n_PRIM/V_ratio;
+        Ns[Coil_PRIM] = n_PRIM;
+        Ns[Coil_SECOND] = n_SECOND;
+      EndIf
+    EndIf
     
     // To be defined separately for each coil portion:
     Sc[Coil_A_PRIM_P] = SurfaceArea[];
@@ -147,7 +165,7 @@ Function {
   phase_E_in_B = 120 *deg;
   phase_E_in_C = 240 *deg;
   
-  r_out = 10;
+  r_out = 1000;
   Resistance[R_out_A] = r_out;
   Resistance[R_out_B] = r_out;
   Resistance[R_out_C] = r_out;
@@ -176,20 +194,37 @@ Constraint {
     Case {
     }
   }
-  { Name Voltage_Cir ;
+  If (Config_prim == 1)
+    { Name Voltage_Cir ;
+      Case {
+        { Region E_in_A; Value val_U_in/Sqrt[3];
+          TimeFunction F_Cos_wt_p[]{2*Pi*Freq, phase_E_in_A-Pi/6}; }
+      }
     Case {
-      { Region E_in_A; Value val_E_in;
-        TimeFunction F_Cos_wt_p[]{2*Pi*Freq, phase_E_in_A}; }
+        { Region E_in_B; Value val_U_in/Sqrt[3];
+          TimeFunction F_Cos_wt_p[]{2*Pi*Freq, phase_E_in_B-Pi/6}; }
+      }
+    Case {
+        { Region E_in_C; Value val_U_in/Sqrt[3];
+          TimeFunction F_Cos_wt_p[]{2*Pi*Freq, phase_E_in_C-Pi/6}; }
+      }
     }
-	Case {
-      { Region E_in_B; Value val_E_in;
-        TimeFunction F_Cos_wt_p[]{2*Pi*Freq, phase_E_in_B}; }
+  ElseIf (Config_prim == 2)
+    { Name Voltage_Cir ;
+      Case {
+        { Region E_in_A; Value val_U_in;
+          TimeFunction F_Cos_wt_p[]{2*Pi*Freq, phase_E_in_A}; }
+      }
+    Case {
+        { Region E_in_B; Value val_U_in;
+          TimeFunction F_Cos_wt_p[]{2*Pi*Freq, phase_E_in_B}; }
+      }
+    Case {
+        { Region E_in_C; Value val_U_in;
+          TimeFunction F_Cos_wt_p[]{2*Pi*Freq, phase_E_in_C}; }
+      }
     }
-	Case {
-      { Region E_in_C; Value val_E_in;
-        TimeFunction F_Cos_wt_p[]{2*Pi*Freq, phase_E_in_C}; }
-    }
-  }
+  EndIf
   { Name ElectricalCircuit ; Type Network ;
   If (Config_prim == 1)
     Case Circuit_1 {
@@ -241,6 +276,19 @@ Constraint {
       { Region Coil_C_SECOND_P; Branch {6,7} ; }
       { Region Coil_C_SECOND_M; Branch {7,1} ; }
     }
+    ElseIf (Config_second == 2)
+      Case Circuit_2 {
+        { Region Coil_A_SECOND_P; Branch {1,2} ; }
+        { Region Coil_A_SECOND_M; Branch {2,3} ; }	
+        { Region Coil_B_SECOND_P; Branch {3,4} ; }
+        { Region Coil_B_SECOND_M; Branch {4,5} ; }	
+        { Region Coil_C_SECOND_P; Branch {5,6} ; }
+        { Region Coil_C_SECOND_M; Branch {6,1} ; }
+
+        { Region R_out_A; Branch {3,1}; }
+        { Region R_out_B; Branch {5,3}; }
+        { Region R_out_C; Branch {1,5}; }
+      }
   EndIf
   }
 }
@@ -261,25 +309,25 @@ PostOperation {
         Print[ U, OnRegion E_in_A, Format FrequencyTable, File > "UI3_shell.txt" ];
         Print[ I, OnRegion E_in_A, Format FrequencyTable, File > "UI3_shell.txt"];
 
-		Echo[ "E_in_B", Format Table, File > "UI3_shell.txt" ];
+		    Echo[ "E_in_B", Format Table, File > "UI3_shell.txt" ];
         Print[ U, OnRegion E_in_B, Format FrequencyTable, File > "UI3_shell.txt" ];
         Print[ I, OnRegion E_in_B, Format FrequencyTable, File > "UI3_shell.txt"];
         
-		Echo[ "E_in_C", Format Table, File > "UI3_shell.txt" ];
+		    Echo[ "E_in_C", Format Table, File > "UI3_shell.txt" ];
         Print[ U, OnRegion E_in_C, Format FrequencyTable, File > "UI3_shell.txt" ];
         Print[ I, OnRegion E_in_C, Format FrequencyTable, File > "UI3_shell.txt"];
         
-		// In text file UI.txt: voltage and current of the secondary coil (from
+		    // In text file UI.txt: voltage and current of the secondary coil (from
         // R_out)
         Echo[ "R_out_A", Format Table, File > "UI3_shell.txt" ];
         Print[ U, OnRegion R_out_A, Format FrequencyTable, File > "UI3_shell.txt" ];
         Print[ I, OnRegion R_out_A, Format FrequencyTable, File > "UI3_shell.txt"];
 		
-		Echo[ "R_out_B", Format Table, File > "UI3_shell.txt" ];
+		    Echo[ "R_out_B", Format Table, File > "UI3_shell.txt" ];
         Print[ U, OnRegion R_out_B, Format FrequencyTable, File > "UI3_shell.txt" ];
         Print[ I, OnRegion R_out_B, Format FrequencyTable, File > "UI3_shell.txt"];
 		
-		Echo[ "R_out_C", Format Table, File > "UI3_shell.txt" ];
+		    Echo[ "R_out_C", Format Table, File > "UI3_shell.txt" ];
         Print[ U, OnRegion R_out_C, Format FrequencyTable, File > "UI3_shell.txt" ];
         Print[ I, OnRegion R_out_C, Format FrequencyTable, File > "UI3_shell.txt"];
       EndIf
