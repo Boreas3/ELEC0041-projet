@@ -280,6 +280,19 @@ Constraint {
 Include "Lib_Magnetodynamics2D_av_Cir.pro";
 
 PostOperation {
+  { Name Power_test; NameOfPostProcessing Magnetodynamics2D_av;
+    Operation{
+      Print[ S_app, OnRegion E_in_A, Format Table, File "UI3_A_shell.txt"];
+      Print[ S_app, OnRegion E_in_B, Format Table, File > "UI3_A_shell.txt"];
+      Print[ S_app, OnRegion E_in_C, Format Table, File > "UI3_A_shell.txt"];
+      Print[ U, OnRegion E_in_A, Format Table, File > "UI3_A_shell.txt"];
+      Print[ U, OnRegion E_in_B, Format Table, File > "UI3_A_shell.txt"];
+      Print[ U, OnRegion E_in_C, Format Table, File > "UI3_A_shell.txt"];
+      Print[ I, OnRegion E_in_A, Format Table, File > "UI3_A_shell.txt"];
+      Print[ I, OnRegion E_in_B, Format Table, File > "UI3_A_shell.txt"];
+      Print[ I, OnRegion E_in_C, Format Table, File > "UI3_A_shell.txt"];
+    }
+  }
   { Name Map_a; NameOfPostProcessing Magnetodynamics2D_av;
     Operation {
       //Print[ j, OnElementsOf Region[{Vol_C_Mag, Vol_S_Mag}], Format Gmsh, File "j.pos" ];

@@ -6,7 +6,7 @@ import matplotlib.pylab as plt
 import math
 class XLSX_WRITE:
     def __init__(self, r_load):
-        self.writer = pd.ExcelWriter("PowerB_shell.xlsx", engine='xlsxwriter')
+        self.writer = pd.ExcelWriter("PowerB_core.xlsx", engine='xlsxwriter')
         self.r_load = r_load
 
     def xlsx_write(self, R_no_load, R_cc, X_no_load, X_cc):
@@ -28,7 +28,7 @@ if __name__ == "__main__":
                                                                 "-setnumber", "r_load", "{}".format(j)])
         temp_res = np.empty([9,2])     
         i = 0               
-        with open('UI3_B_shell.txt', newline='') as csvfile:
+        with open('UI3_B_core.txt', newline='') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=' ')
             for row in spamreader:
                 temp_res[i,:] = [row[2], row[3]]
@@ -52,16 +52,16 @@ if __name__ == "__main__":
         else:
             for i in range(0,3):
                 I[i] = np.complex(temp_res[i+6,0], temp_res[i+6,1])
-            R[j] = P/(np.abs(I).T**2)
-            X[j] = Q/(np.abs(I).T**2)
-            R_mean = P_mean/(np.mean(np.abs(I))**2)
-            X_mean = Q_mean/(np.mean(np.abs(I))**2)
+            R[j] = P/np.abs(I).T
+            X[j] = Q/np.abs(I).T
+            R_mean = P_mean/np.mean(np.abs(I))
+            X_mean = Q_mean/np.mean(np.abs(I))
             R[j] = np.concatenate((R[j][0].T, [R_mean]))
             X[j] = np.concatenate((X[j][0].T, [X_mean]))
     R_no_load = R[1e6]
     R_cc = R[1e-6]
     X_no_load = X[1e6]
-    X_cc = X[1e-6] 
+    X_cc = X[1e-6]
     
     Init_xlsx = XLSX_WRITE(r_load)
     Init_xlsx.xlsx_write(R_no_load, R_cc, X_no_load, X_cc)

@@ -21,7 +21,7 @@ DefineConstant[
     Name "Connection type - primary side"}
     Config_second = {2, Choices{1="Star", 2 = "Delta"}, Highlight "Green", 
     Name "Connection type - secondary side"}
-    s       = DefineNumber[1, Name "Model parameters/Global mesh size",
+    s       = DefineNumber[0.5, Name "Model parameters/Global mesh size",
 		       Help "Reduce for finer mesh"]
   ];
 // Dimensions
