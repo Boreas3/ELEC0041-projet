@@ -1,0 +1,4 @@
+thickness: 300mm
+w_window: 140mm
+w_central_leg: 144mm
+w_external_leg: 220mm

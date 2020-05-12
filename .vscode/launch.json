@@ -1,0 +1,57 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "find_geo_coreA",
+            "type": "python",
+            "request": "launch",
+            "program": "Magnetodynamics\\Three_Phases\\CoreA\\Find_geo.py",
+            "console": "integratedTerminal"
+        },{
+            "name": "find_geo_coreA2",
+            "type": "python",
+            "request": "launch",
+            "program": "Magnetodynamics\\Three_Phases\\CoreA\\Find_geo2.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "find_geo_coreB",
+            "type": "python",
+            "request": "launch",
+            "program": "Magnetodynamics\\Three_Phases\\CoreB\\Find_geo.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "find_geo_coreB2",
+            "type": "python",
+            "request": "launch",
+            "program": "Magnetodynamics\\Three_Phases\\CoreB\\Find_geo2.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "find_geo_shellA",
+            "type": "python",
+            "request": "launch",
+            "program": "Magnetodynamics\\Three_Phases\\ShellA\\Find_geo.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "find_geo_shellA2",
+            "type": "python",
+            "request": "launch",
+            "program": "Magnetodynamics\\Three_Phases\\ShellA\\Find_geo2.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "find_geo_shellB",
+            "type": "python",
+            "request": "launch",
+            "program": "Magnetodynamics\\Three_Phases\\ShellB\\Find_geo.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}
